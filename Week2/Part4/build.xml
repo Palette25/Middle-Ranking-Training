@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Part4" default="run" basedir=".">
+	<property name="blu" value="BlusterCritter"/>
+	<property name="cha2" value="ChameleonCritter"/>
+	<property name="cha" value="ChameleonKid"/>
+	<property name="crb" value="CrabCritter"/>
+	<property name="king" value="KingCrab"/>
+	<property name="mod" value="ModifiedChameleonCritter"/>
+	<property name="qui" value="QuickCrab"/>
+	<property name="roc" value="RockHound"/>
+	<property name="dest" value="classes"/>
+	<property name="lib" value="lib"/>
+	<property name="Part4_jar" value="Part4.jar"/>
+	<path id="classpath">
+		<fileset dir="${dest}" includes="**/*.class"/>
+		<fileset dir="${lib}" includes="**/*.jar"/>
+		<fileset dir="${lib}" includes="**/*.class"/>
+	</path>
+	<target name="init">
+		<mkdir dir="${dest}"/>
+	</target>
+	<target name="compile" depends="init">
+		<javac srcdir="${blu}" destdir="${dest}">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${mod}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${cha}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${cha2}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${cha}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${king}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${qui}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+		<javac srcdir="${roc}" destdir="${dest}" classpath="classpath">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+		</javac>
+	</target>
+	<target name="build" depends="compile">
+		<jar jarfile="${Part4_jar}" basedir="${dest}"/>
+	</target>
+	<target name="run" depends="build">
+		
+	</target>
+	<target name="clean">
+		<delete file="${Part4_jar}"/>
+	</target>
+	<target name="rerun" depends="clean, run">
+		<ant target="clean"/>
+		<ant target="run"/>
+	</target>
+</project>
