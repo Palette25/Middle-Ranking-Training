@@ -23,10 +23,15 @@ public class MazeBug extends Bug {
 	public boolean isEnd = false;
 	public Stack<ArrayList<Location>> crossLocation = new Stack<ArrayList<Location>>();
 	public Stack<Location> currentWay = new Stack<Location>();
-	public Integer stepCount = 0; // Count the total steps;
-	private boolean hasShown = false;//final message has been shown
-	private int[] dirProbability = {1, 1, 1, 1}; // The probability of getting to each directions
-						  			// 0 for North, 1 for East, 2 for South, 3 for West, declockwise
+	// Count the total steps;
+	public Integer stepCount = 0;
+	//final message has been shown
+	private boolean hasShown = false;
+	/* 
+	* The probability of getting to each directions
+	*  0 for North, 1 for East, 2 for South, 3 for West, declockwise
+	*/
+	private int[] dirProbability = {1, 1, 1, 1}; 
 
 	/**
 	 * Constructs a maze bug to green color
@@ -42,10 +47,13 @@ public class MazeBug extends Bug {
 	public void init(){
 		Location curr = getLocation();
 		ArrayList<Location> temp = new ArrayList<Location>();
-		temp.add(curr); // Push the first location into the first arrayList
-		crossLocation.push(temp); 
-		currentWay.push(curr); // Push into the current way stack
-		adjustDirPro(); // First adjust the direction probability
+		// Push the first location into the first arrayList
+		temp.add(curr);
+		crossLocation.push(temp);
+		// Push into the current way stack
+		currentWay.push(curr);
+		// First adjust the direction probability
+		adjustDirPro();
 	}
 
 	/**
@@ -69,7 +77,8 @@ public class MazeBug extends Bug {
 			//increase step count when move 
 			stepCount++;
 		} else {
-			goBack(); // Else go back to old way
+			// Else go back to old way
+			goBack();
 		}
 	}
 
@@ -132,9 +141,11 @@ public class MazeBug extends Bug {
 			currentWay.pop();
 			if(crossLocation.size() > 0){
 				ArrayList<Location> crossList = crossLocation.peek();
+				// Get the back start location
 				Location newStart = crossList.get(0);
 				Location currLoc = getLocation();
 				int moveDirc = currLoc.getDirectionToward(newStart);
+				// Check whether the new start location is valid
 				if(getGrid().isValid(newStart)){
 					setDirection(moveDirc);
 					moveTo(newStart);
@@ -142,6 +153,7 @@ public class MazeBug extends Bug {
 				}else {
 					removeSelfFromGrid();
 				}
+				// Invoke the direction probability reduce method
 				reduceProbs(moveDirc);
 				Flower flower = new Flower(getColor());
 				flower.putSelfInGrid(getGrid(), currLoc);
@@ -246,8 +258,10 @@ public class MazeBug extends Bug {
 	*/
 	public void dfsDecision(Location loc){
 		ArrayList<Location> validNeighbors = getValid(loc);
-		int maxProb = -10000; // The max probability
-		int indexOfMaxProb = 0; // The index of the max probability direction
+		// The max probability
+		int maxProb = -1000000;
+		// The index of the max probability direction
+		int indexOfMaxProb = 0;
 		for(int i=0; i<validNeighbors.size(); i++){
 			Location temp = validNeighbors.get(i);
 			int direction = loc.getDirectionToward(temp);
@@ -274,7 +288,7 @@ public class MazeBug extends Bug {
 	*/
 	public void randomChoice(ArrayList<Location> valid, int maxIndex, int maxProb){
 		int randomNum = (int)(Math.random() * 10);
-
+		// In most of the situation, we choose the max probability direction
 		if(randomNum >= 0 && randomNum < 9){
 			Location nloc = getLocation();
 			ArrayList<Location> maxNeighbors = new ArrayList<Location>();
@@ -292,6 +306,7 @@ public class MazeBug extends Bug {
 			}
 			dirProbability[nloc.getDirectionToward(next)/90]++;
 		}else {
+			// Or we randomly choose the rest of these directions
 			next = valid.get(randomNum % valid.size());
 			int temp = getLocation().getDirectionToward(next);
 			dirProbability[temp / 90]++;

@@ -51,7 +51,9 @@ public class ImplementImageProcessor implements IImageProcessor{
             colorType = type;
             canFilterIndexColorModel = true;
         }
-
+        /*
+        * Override filterRGB method, provide four choices for color filting
+        */
         public int filterRGB(int x, int y, int rgb){
             switch(colorType){
                 case "red": return rgb & redRGB;
@@ -61,8 +63,12 @@ public class ImplementImageProcessor implements IImageProcessor{
             }
         }
 
+        /*
+        * Gte Gray color RGB value method
+        */
         public int getGrayValue(int x, int y, int rgb){
-            int alpha = rgb & alphaRGB; // Get the alpha value from 24 to 31 bit
+            // Get the alpha value from 24 to 31 bit
+            int alpha = rgb & alphaRGB; 
             int result_rgb = (int)(((rgb & 0x00FF0000) >> 16)*0.299 + ((rgb & 0x0000FF00) >> 8)*0.587+
                     (rgb & 0x000000FF)*0.114);
             return alpha + (result_rgb << 16) + (result_rgb << 8) + result_rgb;
