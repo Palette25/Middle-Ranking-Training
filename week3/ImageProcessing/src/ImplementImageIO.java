@@ -44,16 +44,25 @@ public class ImplementImageIO implements IImageIO {
         return null;
     }
 
+    /*
+	* My image info reader for myRead method
+	*/
     public class ImageInfoReader{
 
-        public int bitHeight; // The height of the bitmap image
-        public int bitWidth; // The width of the bitmap image
-        public int bitSize; // The bitmap size
-        public int pixelBit; // The bit number of every pixel
-        public int[] imagePixels; // The pixel array of the image
-        public byte[] imageHead; // The head message of bitmap image
-        public byte[] imageContent; // The content info of bitmap Image
-
+    	// The height of the bitmap image
+        public int bitHeight; 
+        // The width of the bitmap image
+        public int bitWidth; 
+        // The bitmap size
+        public int bitSize; 
+        // The bit number of every pixel
+        public int pixelBit; 
+        // The pixel array of the image
+        public int[] imagePixels; 
+        // The head message of bitmap image
+        public byte[] imageHead; 
+        // The content info of bitmap Image
+        public byte[] imageContent; 
         /*
         * ImageInfoReader constructer, accept the binary file stream
         */

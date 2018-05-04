@@ -9,7 +9,7 @@ import java.io.*;
 import java.awt.*;
 import javax.imageio.ImageIO;
 
-public class ImageReaderTest{
+public class ImageProcessorerTest{
 	// Test the myRead method in ImplementImageIO
 	@Test
 	public void test1() throws IOException{
