@@ -8,7 +8,6 @@ import info.gridworld.grid.*;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Stack;
 
 import javax.swing.JOptionPane;
@@ -19,12 +18,12 @@ import javax.swing.JOptionPane;
  * The implementation of this class is testable on the AP CS A and AB exams.
  */
 public class MazeBug extends Bug {
-	public Location next;
-	public boolean isEnd = false;
-	public Stack<ArrayList<Location>> crossLocation = new Stack<ArrayList<Location>>();
-	public Stack<Location> currentWay = new Stack<Location>();
-	// Count the total steps;
-	public Integer stepCount = 0;
+	private Location next;
+	private boolean isEnd = false;
+	private Stack<ArrayList<Location>> crossLocation = new Stack<ArrayList<Location>>();
+	private Stack<Location> currentWay = new Stack<Location>();
+	
+	private Integer stepCount = 0;
 	//final message has been shown
 	private boolean hasShown = false;
 	/* 
@@ -64,10 +63,10 @@ public class MazeBug extends Bug {
 			init();
 		}
 		boolean willMove = canMove();
-		if (isEnd == true) {
+		if (isEnd) {
 			//to show step count when reach the goal
 			showFinalWay();		
-			if (hasShown == false) {
+			if (!hasShown) {
 				String msg = stepCount.toString() + " steps";
 				JOptionPane.showMessageDialog(null, msg);
 				hasShown = true;
@@ -91,8 +90,9 @@ public class MazeBug extends Bug {
 	 */
 	public ArrayList<Location> getValid(Location loc) {
 		Grid<Actor> gr = getGrid();
-		if (gr == null)
+		if (gr == null){
 			return null;
+		}
 		ArrayList<Location> valid = new ArrayList<Location>();
 		
 		// Define only four directions options
@@ -124,11 +124,7 @@ public class MazeBug extends Bug {
 	public boolean canMove() {
 		Location now = getLocation();
 		ArrayList<Location> validNeighbors = getValid(now);
-		if(validNeighbors.size() != 0){
-			return true;
-		}else {
-			return false;
-		}
+		return validNeighbors.size() != 0;
 	}
 
 	/*
@@ -208,8 +204,9 @@ public class MazeBug extends Bug {
 	 */
 	public void move() {
 		Grid<Actor> gr = getGrid();
-		if (gr == null)
+		if (gr == null){
 			return;
+		}
 		Location loc = getLocation();
 		dfsDecision(loc);
 		if (gr.isValid(next)) {
@@ -230,8 +227,9 @@ public class MazeBug extends Bug {
 			// Push the new way into stack
 			newWay.add(next);
 			crossLocation.push(newWay);
-		} else
+		} else{
 			removeSelfFromGrid();
+		}
 		Flower flower = new Flower(getColor());
 		flower.putSelfInGrid(gr, loc);
 	}
@@ -289,7 +287,7 @@ public class MazeBug extends Bug {
 	public void randomChoice(ArrayList<Location> valid, int maxIndex, int maxProb){
 		int randomNum = (int)(Math.random() * 10);
 		// In most of the situation, we choose the max probability direction
-		if(randomNum >= 0 && randomNum < 9){
+		if(randomNum >= 0 && randomNum < 7){
 			Location nloc = getLocation();
 			ArrayList<Location> maxNeighbors = new ArrayList<Location>();
 			for(Location loc : valid){

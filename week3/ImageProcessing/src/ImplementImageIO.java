@@ -1,7 +1,6 @@
 import imagereader.IImageIO;
 import java.io.FileInputStream;
 import java.io.File;
-import javax.tools.Tool;
 import java.awt.*;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
@@ -21,9 +20,8 @@ public class ImplementImageIO implements IImageIO {
             stream.close();
             return result;
         }catch(Exception e){
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /*
@@ -39,80 +37,89 @@ public class ImplementImageIO implements IImageIO {
             ImageIO.write(buff, "bmp", destFile);
             return image;
         }catch(Exception e){
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /*
-	* My image info reader for myRead method
-	*/
+    * My image info reader for myRead method
+    */
     public class ImageInfoReader{
 
-    	// The height of the bitmap image
-        public int bitHeight; 
+        // The height of the bitmap image
+        private int bitHeight; 
         // The width of the bitmap image
-        public int bitWidth; 
+        private int bitWidth; 
         // The bitmap size
-        public int bitSize; 
+        private int bitSize; 
         // The bit number of every pixel
-        public int pixelBit; 
+        private int pixelBit; 
         // The pixel array of the image
-        public int[] imagePixels; 
+        private int[] imagePixels; 
         // The head message of bitmap image
-        public byte[] imageHead; 
+        private byte[] imageHead; 
         // The content info of bitmap Image
-        public byte[] imageContent; 
+        private byte[] imageContent; 
+
+        private static final int FAC = 0xFF;
         /*
         * ImageInfoReader constructer, accept the binary file stream
         */
         public ImageInfoReader(FileInputStream stream){
+            imageHead = new byte[14];
+            imageContent = new byte[40];
             try{
-                imageHead = new byte[14];
-                imageContent = new byte[40];
                 stream.read(imageHead, 0, 14);
                 stream.read(imageContent, 0, 40);
-                bitSize = (int)((imageContent[23] & 0xFF) << 24 | (imageContent[22] & 0xFF) << 16 | 
-                            (imageContent[21] & 0xFF) << 8 | (imageContent[20] & 0xFF));
-                bitHeight = (int)((imageContent[11] & 0xff) << 24 | (imageContent[10] & 0xFF) << 16 |
-                            (imageContent[9] & 0xFF) << 8 | (imageContent[8] & 0xFF));
-                bitWidth = (int)((imageContent[7] & 0xFF) << 24 | (imageContent[6] & 0xFF) << 16 |
-                            (imageContent[5] & 0xFF) << 8 | (imageContent[4] & 0xFF));
-                pixelBit = (int)((imageContent[15] & 0xFF) << 8 | (imageContent[14] & 0xFF));
-                /*
-                * Judge whether the bit length of every pixel is 24
-                */
-                if(pixelBit == 24){
-                    int emptyBytesNum = (bitSize / bitHeight) - 3*bitWidth;
-                /*
-                * Decide the empty byte in every row, and if it's four then don't need
-                * to make empty spaces
-                */
-                    if(emptyBytesNum == 4){
-                        emptyBytesNum = 0;
-                    }
-                    imagePixels = new int[bitWidth * bitHeight];
-                    byte allPixels[] = new byte[bitSize];
-                    stream.read(allPixels, 0, bitSize);
-                    int count = 0;
-                /*
-                * Loop the fill the pixel array of this bmp image, storing from down to
-                * up, left to right
-                */
-                    for(int i=bitHeight-1; i>=0; i--){
-                        for(int j=0; j<bitWidth; j++){
-                            imagePixels[j + i * bitWidth] = 0xFF << 24 // They say this make the opacity correct
-                            | (allPixels[count+2] & 0xFF) << 16 | (allPixels[count+1] & 0xFF) << 8
-                            | (allPixels[count] & 0xFF);    
-                             count += 3; 
-                        }
-                       count += emptyBytesNum;
-                    }
-                }
             }catch(Exception e){
-                e.printStackTrace();
+                return;
             }
-        }
+            int tempVar1 = (imageContent[23] & FAC) << 24 | (imageContent[22] & FAC) << 16;
+            int tempVar2 = (imageContent[21] & FAC) << 8 | (imageContent[20] & FAC);
+            bitSize = (int)( tempVar1 | tempVar2);
+            tempVar1 = (imageContent[11] & FAC) << 24 | (imageContent[10] & FAC) << 16;
+            tempVar2 = (imageContent[9] & FAC) << 8 | (imageContent[8] & FAC);
+            bitHeight = (int)( tempVar1 | tempVar2);
+            tempVar1 = (imageContent[7] & FAC) << 24 | (imageContent[6] & FAC) << 16;
+            tempVar2 = (imageContent[5] & FAC) << 8 | (imageContent[4] & FAC);
+            bitWidth = (int)( tempVar1 | tempVar2);
+            pixelBit = (int)((imageContent[15] & FAC) << 8 | (imageContent[14] & FAC));
+            /*
+            * Judge whether the bit length of every pixel is 24
+            */
+            if(pixelBit == 24){
+                int emptyBytesNum = (bitSize / bitHeight) - 3*bitWidth;
+            /*
+            * Decide the empty byte in every row, and if it's four then don't need
+            * to make empty spaces
+            */
+                if(emptyBytesNum == 4){
+                    emptyBytesNum = 0;
+                }
+                imagePixels = new int[bitWidth * bitHeight];
+                byte allPixels[] = new byte[bitSize];
+                try{
+                    stream.read(allPixels, 0, bitSize);
+                }catch(Exception e){
+                    return;
+                }
+                int count = 0;
+            /*
+            * Loop the fill the pixel array of this bmp image, storing from down to
+            * up, left to right
+            */
+                for(int i=bitHeight-1; i>=0; i--){
+                    for(int j=0; j<bitWidth; j++){
+                        // They say this make the opacity correct
+                        int temp = FAC << 24 | (allPixels[count+2] & FAC) << 16;
+                        int tenp = (allPixels[count+1] & FAC) << 8| (allPixels[count] & FAC);
+                        imagePixels[j + i * bitWidth] = temp | tenp;    
+                            count += 3; 
+                    }
+                    count += emptyBytesNum;
+                }
+            }
+    }
 
         /*
         * Turn binary file stream into BMP image
@@ -121,8 +128,7 @@ public class ImplementImageIO implements IImageIO {
             Toolkit kit = Toolkit.getDefaultToolkit();
             MemoryImageSource source = new MemoryImageSource(bitWidth, bitHeight, 
                                                         imagePixels, 0, bitWidth);
-            Image result = kit.createImage((ImageProducer)source);
-            return result;
+            return kit.createImage((ImageProducer)source);
         }
 
     }

@@ -112,7 +112,7 @@ public class Solution extends Jigsaw {
 				}
 			}
 		}
-		int s = 2 * f1 + 6 * f2 + 2 * f3;
+		int s = 1 * f1 + 6 * f2 + 2 * f3;
 		jNode.setEstimatedValue(s);
 	}
 
